@@ -71,6 +71,17 @@ static const struct yogafan_config legion_16bit_dual_cfg = {
 	.paths = { "\\_SB.PCI0.LPC0.EC0.FANS", "\\_SB.PCI0.LPC0.EC0.FA2S" }
 };
 
+/*
+ * Lenovo Yoga Pro 9 16IMH9 (83DN) uses the PC00 namespace and has two
+ * 8-bit fan tachometer fields.
+ */
+static const struct yogafan_config yoga_pro_83dn_cfg = {
+	.multiplier = 100,
+	.fan_count = 2,
+	.paths = { "\\_SB.PC00.LPCB.EC0.FANS",
+		   "\\_SB.PC00.LPCB.EC0.FA2S" }
+};
+
 static void apply_rllag_filter(struct yoga_fan_data *data, int idx, long raw_rpm)
 {
 	ktime_t now = ktime_get_boottime();
@@ -170,6 +181,14 @@ static const struct hwmon_chip_info yoga_fan_chip_info = {
 };
 
 static const struct dmi_system_id yogafan_quirks[] = {
+	{
+		.ident = "Lenovo Yoga Pro 9 16IMH9 (83DN)",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "83DN"),
+		},
+		.driver_data = (void *)&yoga_pro_83dn_cfg,
+	},
 	{
 		.ident = "Lenovo Yoga",
 		.matches = {
